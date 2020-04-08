@@ -1,3 +1,7 @@
 {
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "python.pythonPath": "/home/weverton/.cache/pypoetry/virtualenvs/covid-19-qTS0y4Xn-py3.7/bin/python",
+    "python.linting.banditEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
 }

@@ -36,6 +36,7 @@ class DataSource:
         self.date_column = date_column
         self.date_format = date_format
         self.encoding = encoding
+        self.data = pd.DataFrame()
 
     def get_data(self) -> None:
         """Get the date from the path."""
@@ -53,20 +54,20 @@ class DataSource:
             self.data.drop(self.drop_columns, axis=1, inplace=True)
         print("Done!\b")
 
-    def store_data(self, db_connection, table_name=None) -> None:
+    def store_data(self, db_connection, table_name=None, if_exists="replace") -> None:
         """Store the dara in SQLite database.
 
         Args:
             db_file (str): file to write the date in.
             table_name (str): table name. Defaults to the data source label.
         """
-        print(f"\nStoring data in the database...")
         self.data.to_sql(
             name=table_name or self.label,
             con=db_connection,
             index=False,
-            if_exists="replace",
+            if_exists=if_exists,
         )
+        print(f"\nStoring data in the database... ({if_exists})")
         print("Done!\b")
 
 
