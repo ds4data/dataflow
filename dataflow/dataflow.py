@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
-
 import sqlite3
+import sys
 
 import pandas as pd
 import yaml
@@ -61,13 +61,13 @@ class DataSource:
             db_file (str): file to write the date in.
             table_name (str): table name. Defaults to the data source label.
         """
+        print(f"\nStoring data in the database...")
         self.data.to_sql(
             name=table_name or self.label,
             con=db_connection,
             index=False,
             if_exists=if_exists,
         )
-        print(f"\nStoring data in the database... ({if_exists})")
         print("Done!\b")
 
 
@@ -109,5 +109,5 @@ class DataFlow:
 
 
 if __name__ == "__main__":
-    with DataFlow("input.yaml") as dataflow:
+    with DataFlow(sys.argv[1]) as dataflow:
         dataflow.run()

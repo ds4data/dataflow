@@ -34,7 +34,7 @@ if st.text_input("Senha: ") == "ds4data":
                 st.subheader("Dados:")
                 st.write(ds.data)
             st.write("## Processamento")
-            drop_columns = st.multiselect(label="Ignorar Colunas", options=columns)
+            ds.drop_columns = st.multiselect(label="Ignorar Colunas", options=columns)
             columns.insert(0, "")
             date_column = st.selectbox(
                 label="Coluna com data", options=columns, index=0
@@ -54,7 +54,7 @@ if st.text_input("Senha: ") == "ds4data":
             db_extension = ".db"
             if not database.endswith(db_extension):
                 database = database + db_extension
-            label = st.text_input(
+            ds.label = st.text_input(
                 label="Nome da tabela no banco de dados (case-insensitive)"
             ).lower()
             if_exists = st.selectbox(
@@ -67,13 +67,13 @@ if st.text_input("Senha: ") == "ds4data":
                 }[x],
                 index=1,
             )
-            if label:
+            if ds.label:
                 if st.button("Processar e gravar dados"):
                     ds.transform_data()
                     connection = df.sqlite3.connect(database)
-                    ds.store_data(connection, table_name=label, if_exists=if_exists)
+                    ds.store_data(connection, if_exists=if_exists)
                     connection.close()
-                    st.success(f"Dados gravados com sucesso em {label}! ✅")
+                    st.success(f"Dados gravados com sucesso em {ds.label}! ✅")
                     st.balloons()
                     st.write(ds.data)
         except FileNotFoundError:
