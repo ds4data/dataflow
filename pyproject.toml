@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "covid_19"
 version = "0.1.0"
-description = "Simple module to fetch data about COVI-19 cases in Brasil and store in a SQLite database."
+description = "Simple module to fetch data in CSV and store it in a SQLite database."
 authors = ["Weverton Marques <wevertonms@gmail.com>"]
 license = "MIT"
 
