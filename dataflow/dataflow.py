@@ -48,7 +48,7 @@ class DataSource:
         """Tranform and clean the data."""
         print("Tranformming and cleaning data...")
         if self.date_column:
-            dates = pd.to_datetime(self.data[self.date_column])
+            dates = pd.to_datetime(self.data[self.date_column], format=self.date_format)
             self.data[self.date_column] = dates.apply(lambda x: str(x.to_datetime64()))
             self.data.drop(self.drop_columns, axis=1, inplace=True)
         print("Done!\b")
