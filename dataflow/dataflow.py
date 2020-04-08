@@ -1,11 +1,73 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import pandas as pd
-import datetime
 import sqlite3
-from datetime import datetime
+
+import pandas as pd
 import yaml
+
+
+class DataSource:
+    def __init__(
+        self,
+        label,
+        path,
+        sep=",",
+        drop_columns=[],
+        date_column=None,
+        date_format="%Y-%m-%d",
+        encoding="utf-8",
+    ):
+        """Handler for Source for data in plain or compressed CSV.
+
+        Args:
+            label ([type]): [description]
+            path (str): path.
+            sep (str): columns delimiter. Defaults to ",".
+            drop_columns (list, optional): columns to be dropped.. Defaults to [].
+            date_column (str, optional): [description]. Defaults to None.
+            date_format (str, optional): [description]. Defaults to "%Y-%m-%d".
+            encoding (str, optional): [description]. Defaults to "utf-8".
+        """
+        self.label = label
+        self.path = path
+        self.sep = sep
+        self.drop_columns = drop_columns or []
+        self.date_column = date_column
+        self.date_format = date_format
+        self.encoding = encoding
+
+    def get_data(self) -> None:
+        """Get the date from the path."""
+        print(f"Fetching data from {self.path} ...\n")
+        self.data = pd.read_csv(self.path, sep=self.sep, encoding=self.encoding)
+        print("Amostra:")
+        print(self.data.head())
+
+    def transform_data(self) -> None:
+        """Tranform and clean the data."""
+        print("Tranformming and cleaning data...")
+        if self.date_column:
+            dates = pd.to_datetime(self.data[self.date_column])
+            self.data[self.date_column] = dates.apply(lambda x: str(x.to_datetime64()))
+            self.data.drop(self.drop_columns, axis=1, inplace=True)
+        print("Done!\b")
+
+    def store_data(self, db_connection, table_name=None) -> None:
+        """Store the dara in SQLite database.
+
+        Args:
+            db_file (str): file to write the date in.
+            table_name (str): table name. Defaults to the data source label.
+        """
+        print(f"\nStoring data in the database...")
+        self.data.to_sql(
+            name=table_name or self.label,
+            con=db_connection,
+            index=False,
+            if_exists="replace",
+        )
+        print("Done!\b")
 
 
 class DataFlow:
@@ -22,75 +84,13 @@ class DataFlow:
                 content = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
                 print(exc)
-        self.__dict__.update(content)
-
-    def get_data(self, source: str, sep: str = ",") -> pd.DataFrame:
-        """Get the date from the source.
-
-        Args:
-            source (str): source.
-            sep (str): columns delimiter. Defaults to ",".
-
-        Returns:
-            pd.DataFrame: data.
-        """
-        print(f"Fetching data from {source} ...\n")
-        data = pd.read_csv(source, sep=sep)
-        print("Amostra:")
-        print(data.head())
-        return data
-
-    def transform_data(
-        self,
-        data: pd.DataFrame,
-        date_column: str = "date",
-        date_format="%Y-%m-%d",
-        drop_columns: list = [],
-    ) -> pd.DataFrame:
-        """Tranform and clean the data.
-
-        Args:
-            file (pd.DataFrame): data.
-            drop_columns (List): columns to be dropped.
-            date_column (str, optional): column where lies the date for the records. Defaults to "date".
-            date_format (str, optional): format for the date in date_column. Defaults to "%Y-%m-%d".
-
-        Returns:
-            pd.DataFrame: transformed data.
-        """
-        print("Tranformming and cleaning data...")
-        # data[date_column] = pd.to_datetime(data[date_column], format=date_format)
-        data[date_column] = data[date_column].apply(
-            lambda x: datetime.strptime(x, date_format)
-        )
-        data.drop(drop_columns or [], axis=1, inplace=True)
-        print("Done!\b")
-        return data
-
-    def store_data(self, data: pd.DataFrame, db_file: str, table_name: str) -> None:
-        """Store the dara in SQLite database.
-
-        Args:
-            data (pd.DataFrame): data.
-            db_file (str): file to write the date in.
-            table_name (str): table name.
-        """
-        print(f"\nStoring data in {self.output_file}...")
-        data.to_sql(
-            name=table_name, index=False, con=self.connection, if_exists="replace"
-        )
-        print("Done!\b")
-
-    def run(self):
-        for label, values in zip(self.sources.keys(), self.sources.values()):
-            data = self.get_data(values["source"], values["sep"])
-            data = self.transform_data(
-                data,
-                values["date_column"],
-                values["date_format"],
-                values["drop_columns"],
+        self.output_file = content["output_file"]
+        self.sources = [
+            DataSource(label, **values)
+            for label, values in zip(
+                content["sources"].keys(), content["sources"].values()
             )
-            self.store_data(data, self.output_file, label)
+        ]
 
     def __enter__(self):
         self.connection = sqlite3.connect(self.output_file)
@@ -99,6 +99,12 @@ class DataFlow:
     def __exit__(self, type, value, traceback):
         self.connection.close()
         return self
+
+    def run(self):
+        for source in self.sources:
+            source.get_data()
+            source.transform_data()
+            source.store_data(self.connection)
 
 
 if __name__ == "__main__":
