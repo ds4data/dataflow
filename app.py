@@ -19,9 +19,12 @@ if st.text_input("Senha: ") == "ds4data":
     encoding = st.selectbox(
         label="Codificação", options=["utf-8", "iso-8859-1"], index=0
     )
-    path = st.file_uploader(
-        "Choose a CSV file", type=["csv", "csv.gz"], encoding=encoding
-    )
+    if st.checkbox("Usar link"):
+        path = st.text_input("Link")
+    else:
+        path = st.file_uploader(
+            "Envie um arquivo CSV", type=["csv", "csv.gz"], encoding=encoding
+        )
     if path:
         sep = st.text_input(label="Delimitador", value=",")
         try:
