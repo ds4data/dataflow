@@ -41,10 +41,18 @@ if st.text_input("Senha: ") == "ds4data":
                 st.write(
                     "###### Documentação: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
                 )
-
-            database = st.selectbox("Database", options=glob.glob("*.db"))
+            new_database = st.checkbox("Criar nova base de dados")
+            if new_database:
+                database = st.text_input("Nova Database ('*.db')")
+            else:
+                database = st.selectbox(
+                    "Databases existentes", options=glob.glob("*.db")
+                )
+            db_extension = ".db"
+            if not database.endswith(db_extension):
+                database = database + db_extension
             label = st.text_input(
-                label="Nome da tabela no bando de dados (case-insensitive)"
+                label="Nome da tabela no banco de dados (case-insensitive)"
             ).lower()
             if_exists = st.selectbox(
                 "Em caso de tabela existente com mesmo nome",
@@ -63,7 +71,7 @@ if st.text_input("Senha: ") == "ds4data":
                     ds.store_data(connection, table_name=label, if_exists=if_exists)
                     connection.close()
                     st.success(f"Dados gravados com sucesso em {label}! ✅")
-                    # st.balloons()
+                    st.balloons()
                     st.write(ds.data)
         except FileNotFoundError:
             pass
