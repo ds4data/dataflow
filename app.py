@@ -4,21 +4,13 @@ import glob
 from dataflow import dataflow as df
 
 
-@st.cache(persist=True)
-def get_data(path, sep, encoding):
-    if path:
-        ds = df.DataSource("", path, sep, encoding=encoding)
-        ds.get_data()
-        return ds
-    return None
-
-
 st.title("DS4Data")
-if st.text_input("Senha: ") == "ds4data":
+if st.text_input("Senha: ") == "1":
     st.write("## Adição de base de dados")
     encoding = st.selectbox(
         label="Codificação", options=["utf-8", "iso-8859-1"], index=0
     )
+    sep = st.text_input(label="Delimitador", value=",")
     if st.checkbox("Usar link"):
         path = st.text_input("Link")
     else:
@@ -26,9 +18,16 @@ if st.text_input("Senha: ") == "ds4data":
             "Envie um arquivo CSV", type=["csv", "csv.gz"], encoding=encoding
         )
     if path:
-        sep = st.text_input(label="Delimitador", value=",")
+        ds = df.DataSource("", path, sep, encoding=encoding)
+
+        @st.cache(persist=True, allow_output_mutation=True)
+        def get_data():
+            if path:
+                return df.pd.read_csv(path, sep=sep, encoding=encoding)
+            return None
+
         try:
-            ds = get_data(path, sep, encoding)
+            ds.data = get_data()
             columns = list(ds.data.columns)
             if st.checkbox("Exibir dados", value=True):
                 st.subheader("Dados:")
