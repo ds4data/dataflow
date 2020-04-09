@@ -5,7 +5,7 @@ from dataflow import dataflow as df
 
 
 st.title("DS4Data")
-if st.text_input("Senha: ") == "1":
+if st.text_input("Senha: ") == "ds4data":
     st.write("## Adição de base de dados")
     encoding = st.selectbox(
         label="Codificação", options=["utf-8", "iso-8859-1"], index=0
