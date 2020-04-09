@@ -7,7 +7,7 @@ sources:
     date_column: date
     date_format: "%Y-%m-%d"
   saude.gov.br:
-    path: https://mobileapps.saude.gov.br/esus-vepi/files/unAFkcaNDeXajurGB7LChj8SgQYS2ptm/b350824dbfad17f083e62d4b41e88cb7_Download_COVID19_20200408.csv
+    path: https://mobileapps.saude.gov.br/esus-vepi/files/unAFkcaNDeXajurGB7LChj8SgQYS2ptm/c7ed0d9cf6a6cf254ed3dd8228dbd296_Download_COVID19_20200409.csv
     sep: ";" # Não precisa informar se for ,
     encoding: iso-8859-1  # Não precisa informar se for utf-8
     drop_columns:
