@@ -1,11 +1,14 @@
+import os
 import streamlit as st
 import glob
 
 from dataflow import dataflow as df
 
+print(os.environ["HOME"])
+
 
 st.title("DS4Data")
-if st.text_input("Senha: ") == "ds4data":
+if st.text_input("Senha: ") == os.environ["DATAFLOW_PASSWORD"]:
     st.write("## Adição de base de dados")
     encoding = st.selectbox(
         label="Codificação", options=["utf-8", "iso-8859-1"], index=0
@@ -45,35 +48,37 @@ if st.text_input("Senha: ") == "ds4data":
                 )
             new_database = st.checkbox("Criar nova base de dados")
             if new_database:
-                database = st.text_input("Nova Database ('*.db')")
+                database = f"{os.environ['DB_PATH']}/" + st.text_input("Nova Database")
             else:
                 database = st.selectbox(
-                    "Databases existentes", options=glob.glob("*.db")
+                    "Databases existentes",
+                    options=glob.glob(f"{os.environ['DB_PATH']}*.db"),
                 )
-            db_extension = ".db"
-            if not database.endswith(db_extension):
-                database = database + db_extension
-            ds.label = st.text_input(
-                label="Nome da tabela no banco de dados (case-insensitive)"
-            ).lower()
-            if_exists = st.selectbox(
-                "Em caso de tabela existente com mesmo nome",
-                options=["fail", "replace", "append"],
-                format_func=lambda x: {
-                    "fail": "Avisar",
-                    "replace": "Substituir",
-                    "append": "Anexar",
-                }[x],
-                index=1,
-            )
-            if ds.label:
-                if st.button("Processar e gravar dados"):
-                    ds.transform_data()
-                    connection = df.sqlite3.connect(database)
-                    ds.store_data(connection, if_exists=if_exists)
-                    connection.close()
-                    st.success(f"Dados gravados com sucesso em {ds.label}! ✅")
-                    st.balloons()
-                    st.write(ds.data)
+            if database:
+                db_extension = ".db"
+                if not database.endswith(db_extension):
+                    database = database + db_extension
+                ds.label = st.text_input(
+                    label="Nome da tabela no banco de dados (case-insensitive)"
+                ).lower()
+                if_exists = st.selectbox(
+                    "Em caso de tabela existente com mesmo nome",
+                    options=["fail", "replace", "append"],
+                    format_func=lambda x: {
+                        "fail": "Avisar",
+                        "replace": "Substituir",
+                        "append": "Anexar",
+                    }[x],
+                    index=1,
+                )
+                if ds.label:
+                    if st.button("Processar e gravar dados"):
+                        ds.transform_data()
+                        connection = df.sqlite3.connect(database)
+                        ds.store_data(connection, if_exists=if_exists)
+                        connection.close()
+                        st.success(f"Dados gravados com sucesso em {ds.label}! ✅")
+                        st.balloons()
+                        st.write(ds.data)
         except FileNotFoundError:
             pass
