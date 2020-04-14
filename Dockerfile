@@ -1,7 +1,7 @@
-FROM python:3.7.6
+FROM python:3.8-slim-buster
 
-ADD . /dataflow
+ADD . /app
 
-RUN pip install -r dataflow/requirements.txt
+RUN pip install -r app/requirements.txt
 
-CMD [ "streamlit", "run", "dataflow/app.py" ]
+CMD [ "streamlit", "run", "app/app.py" ]

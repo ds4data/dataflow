@@ -7,11 +7,11 @@ sources:
     date_column: date
     date_format: "%Y-%m-%d"
   saude.gov.br:
-    path: https://mobileapps.saude.gov.br/esus-vepi/files/unAFkcaNDeXajurGB7LChj8SgQYS2ptm/c7ed0d9cf6a6cf254ed3dd8228dbd296_Download_COVID19_20200409.csv
+    path: https://mobileapps.saude.gov.br/esus-vepi/files/unAFkcaNDeXajurGB7LChj8SgQYS2ptm/dfe64e164c58c05c77afdd5ecbe8c689_Download_COVID19_20200413.csv
     sep: ";" # Não precisa informar se for ,
     encoding: iso-8859-1  # Não precisa informar se for utf-8
     drop_columns:
-    date_column: date
+    date_column: data
     date_format: "%d/%m/%Y"
   # UBSs - AL:
   #   path: /home/weverton/Dropbox/DS4/covid_19/UBSs-CORONAViRUS_AL.csv
