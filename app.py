@@ -6,7 +6,7 @@ import glob
 from dataflow import dataflow as df
 
 
-DB_PATH = Path(os.environ["PWD"])
+DB_PATH = Path(os.environ["DB_PATH"])
 DATAFLOW_PASSWORD = os.environ["DATAFLOW_PASSWORD"]
 
 
