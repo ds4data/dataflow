@@ -1,14 +1,17 @@
 import os
+from pathlib import Path
 import streamlit as st
 import glob
 
 from dataflow import dataflow as df
 
-print(os.environ["HOME"])
+
+DB_PATH = Path(os.environ["PWD"])
+DATAFLOW_PASSWORD = os.environ["DATAFLOW_PASSWORD"]
 
 
 st.title("DS4Data")
-if st.text_input("Senha: ") == os.environ["DATAFLOW_PASSWORD"]:
+if st.text_input("Senha: ") == DATAFLOW_PASSWORD:
     st.write("## Adição de base de dados")
     encoding = st.selectbox(
         label="Codificação", options=["utf-8", "iso-8859-1"], index=0
@@ -42,18 +45,16 @@ if st.text_input("Senha: ") == os.environ["DATAFLOW_PASSWORD"]:
                 label="Coluna com data", options=columns, index=0
             )
             if date_column:
-                date_format = st.text_input(label="Formato da data", value="%Y-%m-%d",)
-                st.write(
-                    "###### Documentação: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
+                date_format = st.text_input(label="Formato da data (https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)",
+                    value="%Y-%m-%d",
                 )
             new_database = st.checkbox("Criar nova base de dados")
             if new_database:
-                database = f"{os.environ['DB_PATH']}/" + st.text_input("Nova Database")
+                database = st.text_input("Nova Database")
             else:
-                database = st.selectbox(
-                    "Databases existentes",
-                    options=glob.glob(f"{os.environ['DB_PATH']}*.db"),
-                )
+                options = glob.glob(str(DB_PATH / "*.db"))
+                print(options)
+                database = st.selectbox("Databases existentes", options=options)
             if database:
                 db_extension = ".db"
                 if not database.endswith(db_extension):
